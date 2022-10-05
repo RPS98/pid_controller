@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-set(PROJECT_NAME PID_controller)
+set(PROJECT_NAME pid_controller)
 project(${PROJECT_NAME})
 
 # Default to C++17

@@ -1,5 +1,5 @@
 #include <benchmark/benchmark.h>
-#include <PID_controller.hpp>
+#include <pid_controller.hpp>
 #include <exception>
 
 using namespace controller;

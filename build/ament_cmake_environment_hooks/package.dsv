@@ -1,4 +1,0 @@
-source;share/PID_controller/local_setup.bash
-source;share/PID_controller/local_setup.dsv
-source;share/PID_controller/local_setup.sh
-source;share/PID_controller/local_setup.zsh
