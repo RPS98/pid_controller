@@ -31,8 +31,8 @@ include_directories(
 )
 
 set(SOURCE_CPP_FILES
-  src/${PROJECT_NAME}.cpp
-  src/${PROJECT_NAME}_1D.cpp
+  src/PID.cpp
+  src/PID_3D.cpp
 )
 
 # create library and export it

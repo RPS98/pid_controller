@@ -1,14 +1,14 @@
 #include <benchmark/benchmark.h>
-#include <pid_controller.hpp>
+#include <PID_3D.hpp>
 #include <exception>
 
-using namespace controller;
+using namespace pid_controller;
 
 using Vector3d = Eigen::Vector3d;
 using Matrix3d = Eigen::Matrix3d;
 
 static void BM_TEST(benchmark::State &state) {
-  PIDController controller = PIDController();
+  PIDController3D controller = PIDController3D();
   Vector3d input           = Vector3d::Identity();
   bool flag                = true;
 

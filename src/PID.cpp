@@ -1,26 +1,26 @@
-#include "pid_controller.hpp"
+#include "PID.hpp"
 
 using namespace controller;
 
-PIDController1D::PIDController1D() {}
+PIDController::PIDController() {}
 
-PIDController1D::~PIDController1D() {}
+PIDController::~PIDController() {}
 
-void PIDController1D::setGains(double &_kp, double &_ki, double &_kd) {
+void PIDController::setGains(double &_kp, double &_ki, double &_kd) {
   Kp_ = _kp;
   Ki_ = _ki;
   Kd_ = _kd;
 }
 
-void PIDController1D::setAntiWindup(double &_anti_windup) { antiwindup_cte_ = _anti_windup; }
+void PIDController::setAntiWindup(double &_anti_windup) { antiwindup_cte_ = _anti_windup; }
 
-void PIDController1D::setAlpha(double &_alpha) { alpha_ = _alpha; }
+void PIDController::setAlpha(double &_alpha) { alpha_ = _alpha; }
 
-void PIDController1D::setResetIntegralSaturationFlag(bool &_reset_integral_flag) {
+void PIDController::setResetIntegralSaturationFlag(bool &_reset_integral_flag) {
   reset_integral_flag_ = _reset_integral_flag;
 }
 
-double PIDController1D::limitOutput(const double &output, const double &limit) {
+double PIDController::limitOutput(const double &output, const double &limit) {
   double limited_output = output;
 
   if (limit != 0.0f) {
@@ -30,7 +30,7 @@ double PIDController1D::limitOutput(const double &output, const double &limit) {
   return limited_output;
 }
 
-double PIDController1D::computeIntegral(const double &_dt, const double &_proportional_error) {
+double PIDController::computeIntegral(const double &_dt, const double &_proportional_error) {
   // If sing of the error changes and the integrator is saturated, reset the integral for each
   // axis
   if (reset_integral_flag_ != 0) {
@@ -52,7 +52,7 @@ double PIDController1D::computeIntegral(const double &_dt, const double &_propor
   return i_position_error_contribution;
 }
 
-double PIDController1D::computeDerivative(const double &_dt, const double &_proportional_error) {
+double PIDController::computeDerivative(const double &_dt, const double &_proportional_error) {
   // Compute the derivative contribution of the error filtered with a first
   // order filter
   double proportional_error_increment = (_proportional_error - last_proportional_error);
@@ -65,7 +65,7 @@ double PIDController1D::computeDerivative(const double &_dt, const double &_prop
   return derivate_error_contribution;
 }
 
-double PIDController1D::computeDerivative(const double &_dt,
+double PIDController::computeDerivative(const double &_dt,
                                           const double &_state_dot,
                                           const double &_reference_dot) {
   // Get the derivate error
@@ -76,7 +76,7 @@ double PIDController1D::computeDerivative(const double &_dt,
   return derivate_error_contribution;
 }
 
-double PIDController1D::computeControl(const double &_dt,
+double PIDController::computeControl(const double &_dt,
                                        const double &_state,
                                        const double &_reference) {
   // Get the error
@@ -103,7 +103,7 @@ double PIDController1D::computeControl(const double &_dt,
   return proportional_error + integral_error_contribution + derivate_error_contribution;
 }
 
-double PIDController1D::computeControl(const double &_dt,
+double PIDController::computeControl(const double &_dt,
                                        const double &_state,
                                        const double &_reference,
                                        const double &_state_dot,
@@ -132,4 +132,4 @@ double PIDController1D::computeControl(const double &_dt,
   return proportional_error + integral_error_contribution + derivate_error_contribution;
 }
 
-void PIDController1D::resetController() { first_run_ = true; }
+void PIDController::resetController() { first_run_ = true; }

@@ -1,26 +1,26 @@
-#include "pid_controller.hpp"
+#include "PID_3D.hpp"
 
 using namespace controller;
 
-PIDController::PIDController() {}
+PIDController3D::PIDController3D() {}
 
-PIDController::~PIDController() {}
+PIDController3D::~PIDController3D() {}
 
-void PIDController::setGains(Vector3d &_kp, Vector3d &_ki, Vector3d &_kd) {
+void PIDController3D::setGains(Vector3d &_kp, Vector3d &_ki, Vector3d &_kd) {
   Kp_lin_mat_ = _kp.asDiagonal();
   Ki_lin_mat_ = _ki.asDiagonal();
   Kd_lin_mat_ = _kd.asDiagonal();
 }
 
-void PIDController::setAntiWindup(Vector3d &_anti_windup) { antiwindup_cte_ = _anti_windup; }
+void PIDController3D::setAntiWindup(Vector3d &_anti_windup) { antiwindup_cte_ = _anti_windup; }
 
-void PIDController::setAlpha(Vector3d &_alpha) { alpha_ = _alpha; }
+void PIDController3D::setAlpha(Vector3d &_alpha) { alpha_ = _alpha; }
 
-void PIDController::setResetIntegralSaturationFlag(bool &_reset_integral_flag) {
+void PIDController3D::setResetIntegralSaturationFlag(bool &_reset_integral_flag) {
   reset_integral_flag_ = _reset_integral_flag;
 }
 
-Vector3d PIDController::limitOutput(const Vector3d &output,
+Vector3d PIDController3D::limitOutput(const Vector3d &output,
                                     const Vector3d &limits,
                                     const bool &proportional_limitation) {
   Vector3d limited_output = output;
@@ -48,7 +48,7 @@ Vector3d PIDController::limitOutput(const Vector3d &output,
   return limited_output;
 }
 
-Vector3d PIDController::computeIntegral(const double &_dt, const Vector3d &_proportional_error) {
+Vector3d PIDController3D::computeIntegral(const double &_dt, const Vector3d &_proportional_error) {
   // If sing of the error changes and the integrator is saturated, reset the integral for each
   // axis
   if (reset_integral_flag_ != 0) {
@@ -72,7 +72,7 @@ Vector3d PIDController::computeIntegral(const double &_dt, const Vector3d &_prop
   return i_position_error_contribution;
 }
 
-Vector3d PIDController::computeDerivative(const double &_dt, const Vector3d &_proportional_error) {
+Vector3d PIDController3D::computeDerivative(const double &_dt, const Vector3d &_proportional_error) {
   // Compute the derivative contribution of the error filtered with a first
   // order filter
   Vector3d proportional_error_increment = (_proportional_error - last_proportional_error);
@@ -85,7 +85,7 @@ Vector3d PIDController::computeDerivative(const double &_dt, const Vector3d &_pr
   return derivate_error_contribution;
 }
 
-Vector3d PIDController::computeDerivative(const double &_dt,
+Vector3d PIDController3D::computeDerivative(const double &_dt,
                                           const Vector3d &_state_dot,
                                           const Vector3d &_reference_dot) {
   // Get the derivate error
@@ -96,7 +96,7 @@ Vector3d PIDController::computeDerivative(const double &_dt,
   return derivate_error_contribution;
 }
 
-Vector3d PIDController::computeControl(const double &_dt,
+Vector3d PIDController3D::computeControl(const double &_dt,
                                        const Vector3d &_state,
                                        const Vector3d &_reference) {
   // Get the error
@@ -123,7 +123,7 @@ Vector3d PIDController::computeControl(const double &_dt,
   return proportional_error + integral_error_contribution + derivate_error_contribution;
 }
 
-Vector3d PIDController::computeControl(const double &_dt,
+Vector3d PIDController3D::computeControl(const double &_dt,
                                        const Vector3d &_state,
                                        const Vector3d &_reference,
                                        const Vector3d &_state_dot,
@@ -152,4 +152,4 @@ Vector3d PIDController::computeControl(const double &_dt,
   return proportional_error + integral_error_contribution + derivate_error_contribution;
 }
 
-void PIDController::resetController() { first_run_ = true; }
+void PIDController3D::resetController() { first_run_ = true; }
