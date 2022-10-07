@@ -1,6 +1,6 @@
 #include "PID.hpp"
 
-using namespace controller;
+using namespace pid_controller;
 
 PIDController::PIDController() {}
 

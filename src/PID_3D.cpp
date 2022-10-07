@@ -1,6 +1,6 @@
 #include "PID_3D.hpp"
 
-using namespace controller;
+using namespace pid_controller;
 
 PIDController3D::PIDController3D() {}
 
