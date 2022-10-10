@@ -6,17 +6,23 @@ PIDController::PIDController() {}
 
 PIDController::~PIDController() {}
 
-void PIDController::setGains(double &_kp, double &_ki, double &_kd) {
+void PIDController::setGains(double _kp, double _ki, double _kd) {
   Kp_ = _kp;
   Ki_ = _ki;
   Kd_ = _kd;
 }
 
-void PIDController::setAntiWindup(double &_anti_windup) { antiwindup_cte_ = _anti_windup; }
+void PIDController::setGainKp(double _kp) { Kp_ = _kp; }
 
-void PIDController::setAlpha(double &_alpha) { alpha_ = _alpha; }
+void PIDController::setGainKi(double _ki) { Ki_ = _ki; }
 
-void PIDController::setResetIntegralSaturationFlag(bool &_reset_integral_flag) {
+void PIDController::setGainKd(double _kd) { Kd_ = _kd; }
+
+void PIDController::setAntiWindup(double _anti_windup) { antiwindup_cte_ = _anti_windup; }
+
+void PIDController::setAlpha(double _alpha) { alpha_ = _alpha; }
+
+void PIDController::setResetIntegralSaturationFlag(bool _reset_integral_flag) {
   reset_integral_flag_ = _reset_integral_flag;
 }
 

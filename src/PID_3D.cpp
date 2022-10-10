@@ -6,17 +6,39 @@ PIDController3D::PIDController3D() {}
 
 PIDController3D::~PIDController3D() {}
 
-void PIDController3D::setGains(Vector3d &_kp, Vector3d &_ki, Vector3d &_kd) {
+void PIDController3D::setGains(Vector3d _kp, Vector3d _ki, Vector3d _kd) {
   Kp_lin_mat_ = _kp.asDiagonal();
   Ki_lin_mat_ = _ki.asDiagonal();
   Kd_lin_mat_ = _kd.asDiagonal();
 }
 
-void PIDController3D::setAntiWindup(Vector3d &_anti_windup) { antiwindup_cte_ = _anti_windup; }
+void PIDController3D::setGainKpX(double _kp) { Kp_lin_mat_(0, 0) = _kp; }
 
-void PIDController3D::setAlpha(Vector3d &_alpha) { alpha_ = _alpha; }
+void PIDController3D::setGainKpY(double _kp) { Kp_lin_mat_(1, 1) = _kp; }
 
-void PIDController3D::setResetIntegralSaturationFlag(bool &_reset_integral_flag) {
+void PIDController3D::setGainKpZ(double _kp) { Kp_lin_mat_(2, 2) = _kp; }
+
+void PIDController3D::setGainKiX(double _ki) { Ki_lin_mat_(0, 0) = _ki; }
+
+void PIDController3D::setGainKiY(double _ki) { Ki_lin_mat_(1, 1) = _ki; }
+
+void PIDController3D::setGainKiZ(double _ki) { Ki_lin_mat_(2, 2) = _ki; }
+
+void PIDController3D::setGainKdX(double _kd) { Kd_lin_mat_(0, 0) = _kd; }
+
+void PIDController3D::setGainKdY(double _kd) { Kd_lin_mat_(1, 1) = _kd; }
+
+void PIDController3D::setGainKdZ(double _kd) { Kd_lin_mat_(2, 2) = _kd; }
+
+void PIDController3D::setAntiWindup(Vector3d _anti_windup) { antiwindup_cte_ = _anti_windup; }
+
+void PIDController3D::setAntiWindup(double _anti_windup) { antiwindup_cte_ = Vector3d::Constant(_anti_windup); }
+
+void PIDController3D::setAlpha(Vector3d _alpha) { alpha_ = _alpha; }
+
+void PIDController3D::setAlpha(double _alpha) { alpha_ = Vector3d::Constant(_alpha); }
+
+void PIDController3D::setResetIntegralSaturationFlag(bool _reset_integral_flag) {
   reset_integral_flag_ = _reset_integral_flag;
 }
 

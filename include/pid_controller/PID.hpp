@@ -16,10 +16,13 @@ public:
   PIDController();
   ~PIDController();
 
-  void setGains(double &_kp, double &_ki, double &_kd);
-  void setAntiWindup(double &_anti_windup);
-  void setAlpha(double &_alpha);
-  void setResetIntegralSaturationFlag(bool &_reset_integral_flag);
+  void setGains(double _kp, double _ki, double _kd);
+  void setGainKp(double _kp);
+  void setGainKi(double _ki);
+  void setGainKd(double _kd);
+  void setAntiWindup(double _anti_windup);
+  void setAlpha(double _alpha);
+  void setResetIntegralSaturationFlag(bool _reset_integral_flag);
 
   double computeControl(const double &_dt, const double &_state, const double &_reference);
   double computeControl(const double &_dt,

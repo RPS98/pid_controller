@@ -16,10 +16,21 @@ public:
   PIDController3D();
   ~PIDController3D();
 
-  void setGains(Vector3d &_kp, Vector3d &_ki, Vector3d &_kd);
-  void setAntiWindup(Vector3d &_anti_windup);
-  void setAlpha(Vector3d &_alpha);
-  void setResetIntegralSaturationFlag(bool &_reset_integral_flag);
+  void setGains(Vector3d _kp, Vector3d _ki, Vector3d _kd);
+  void setGainKpX(double _kp);
+  void setGainKpY(double _kp);
+  void setGainKpZ(double _kp);
+  void setGainKiX(double _ki);
+  void setGainKiY(double _ki);
+  void setGainKiZ(double _ki);
+  void setGainKdX(double _kd);
+  void setGainKdY(double _kd);
+  void setGainKdZ(double _kd);
+  void setAntiWindup(Vector3d _anti_windup);
+  void setAntiWindup(double _anti_windup);
+  void setAlpha(Vector3d _alpha);
+  void setAlpha(double _alpha);
+  void setResetIntegralSaturationFlag(bool _reset_integral_flag);
 
   Vector3d computeControl(const double &_dt, const Vector3d &_state, const Vector3d &_reference);
   Vector3d computeControl(const double &_dt,
