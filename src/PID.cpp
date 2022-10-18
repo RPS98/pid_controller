@@ -2,37 +2,52 @@
 
 using namespace pid_controller;
 
-PIDController::PIDController() {}
+PIDController::PIDController(const bool &verbose) { _verbose = verbose; };
 
 PIDController::~PIDController() {}
 
-void PIDController::setGains(double _kp, double _ki, double _kd) {
-  Kp_ = _kp;
-  Ki_ = _ki;
-  Kd_ = _kd;
-}
+void PIDController::setOutputSaturation(double saturation) {
+  if ((saturation == 0.0)) {
+    if (_verbose) {
+      std::cout << "- PID-Error: Saturation must be greater than zero" << std::endl;
+    }
+    return;
+  }
 
-void PIDController::setGainKp(double _kp) { Kp_ = _kp; }
+  if (saturation < 0.0) {
+    saturation = -saturation;
+  }
+  output_max_saturation_ = saturation;
+  output_min_saturation_ = -saturation;
+  saturation_flag_       = true;
+};
 
-void PIDController::setGainKi(double _ki) { Ki_ = _ki; }
+void PIDController::setOutputSaturation(double _min_saturation, double _max_saturation) {
+  if (_max_saturation > _min_saturation) {
+    output_max_saturation_ = _max_saturation;
+    output_min_saturation_ = _min_saturation;
+    saturation_flag_       = true;
+  } else if (_verbose) {
+    std::cout << "- PID-Error: Max saturation must be greater than min saturation" << std::endl;
+  }
+};
 
-void PIDController::setGainKd(double _kd) { Kd_ = _kd; }
-
-void PIDController::setAntiWindup(double _anti_windup) { antiwindup_cte_ = _anti_windup; }
-
-void PIDController::setAlpha(double _alpha) { alpha_ = _alpha; }
-
-void PIDController::setResetIntegralSaturationFlag(bool _reset_integral_flag) {
-  reset_integral_flag_ = _reset_integral_flag;
-}
-
-double PIDController::limitOutput(const double &output, const double &limit) {
+double PIDController::saturateOutput(const double &output, const double &limit) {
   double limited_output = output;
 
   if (limit != 0.0f) {
     limited_output = (limited_output > limit) ? limit : limited_output;
     limited_output = (limited_output < -limit) ? -limit : limited_output;
   }
+  return limited_output;
+}
+
+double PIDController::saturateOutput(const double &output,
+                                     const double &min_limit,
+                                     const double &max_limit) {
+  double limited_output = output;
+  limited_output        = (limited_output > max_limit) ? max_limit : limited_output;
+  limited_output        = (limited_output < min_limit) ? min_limit : limited_output;
   return limited_output;
 }
 
@@ -51,7 +66,9 @@ double PIDController::computeIntegral(const double &_dt, const double &_proporti
   integral_accum_error_ += _proportional_error * _dt;
 
   // Compute anti-windup. Limit integral contribution
-  integral_accum_error_ = limitOutput(integral_accum_error_, antiwindup_cte_);
+  if (antiwindup_cte_ != 0.0f) {
+    integral_accum_error_ = saturateOutput(integral_accum_error_, antiwindup_cte_);
+  }
 
   // Compute de integral contribution
   double i_position_error_contribution = Ki_ * integral_accum_error_;
@@ -72,8 +89,8 @@ double PIDController::computeDerivative(const double &_dt, const double &_propor
 }
 
 double PIDController::computeDerivative(const double &_dt,
-                                          const double &_state_dot,
-                                          const double &_reference_dot) {
+                                        const double &_state_dot,
+                                        const double &_reference_dot) {
   // Get the derivate error
   double derivate_error = _state_dot - _reference_dot;
 
@@ -82,12 +99,7 @@ double PIDController::computeDerivative(const double &_dt,
   return derivate_error_contribution;
 }
 
-double PIDController::computeControl(const double &_dt,
-                                       const double &_state,
-                                       const double &_reference) {
-  // Get the error
-  double proportional_error = _reference - _state;
-
+double PIDController::computeControl(const double &_dt, const double &proportional_error) {
   // Initialize values for the integral and derivative contributions
   if (first_run_) {
     first_run_              = false;
@@ -110,10 +122,33 @@ double PIDController::computeControl(const double &_dt,
 }
 
 double PIDController::computeControl(const double &_dt,
-                                       const double &_state,
-                                       const double &_reference,
-                                       const double &_state_dot,
-                                       const double &_reference_dot) {
+                                     const double &_state,
+                                     const double &_reference) {
+  // Get the error
+  double proportional_error = _reference - _state;
+
+  // Compute the control
+  return computeControl(_dt, proportional_error);
+}
+
+double PIDController::computeControlWithSaturation(const double &_dt,
+                                                   const double &_state,
+                                                   const double &_reference) {
+  // Compute control
+  double output = computeControl(_dt, _state, _reference);
+
+  // Limit output
+  if (saturation_flag_) {
+    return saturateOutput(output, output_min_saturation_, output_max_saturation_);
+  }
+  return output;
+}
+
+double PIDController::computeControl(const double &_dt,
+                                     const double &_state,
+                                     const double &_reference,
+                                     const double &_state_dot,
+                                     const double &_reference_dot) {
   // Get the error
   double proportional_error = _reference - _state;
 
@@ -138,4 +173,17 @@ double PIDController::computeControl(const double &_dt,
   return proportional_error + integral_error_contribution + derivate_error_contribution;
 }
 
-void PIDController::resetController() { first_run_ = true; }
+double PIDController::computeControlWithSaturation(const double &_dt,
+                                                   const double &_state,
+                                                   const double &_reference,
+                                                   const double &_state_dot,
+                                                   const double &_reference_dot) {
+  // Compute control
+  double output = computeControl(_dt, _state, _reference, _state_dot, _reference_dot);
+
+  // Limit output
+  if (saturation_flag_) {
+    return saturateOutput(output, output_min_saturation_, output_max_saturation_);
+  }
+  return output;
+}
