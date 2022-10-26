@@ -115,7 +115,6 @@ Vector3d computeControl(const double &_dt, const Vector3d &_state, const Vector3
   return proportional_error + integral_error_contribution + derivate_error_contribution;
 }
 
-
 Vector3d computeControl2(const double &_dt, const Vector3d &_state, const Vector3d &_reference) {
   // Get the error
   Vector3d proportional_error = _reference - _state;
@@ -186,9 +185,9 @@ static void BM_TEST(benchmark::State &state) {
   Vector3d filtered_derivate_error = Vector3d::Zero();
 
   double dt          = 0.01;
-  Vector3d state_vec = Vector3d::Identity();
-  Vector3d ref_vec   = 2.0 * Vector3d::Identity();
-  
+  Vector3d state_vec = Vector3d::Ones();
+  Vector3d ref_vec   = 2.0 * Vector3d::Ones();
+
   computeControl(dt, state_vec, ref_vec);
   for (auto _ : state) {
     computeControl(dt, state_vec, ref_vec);
@@ -214,9 +213,9 @@ static void BM_TEST_PID2(benchmark::State &state) {
   Vector3d filtered_derivate_error = Vector3d::Zero();
 
   double dt          = 0.01;
-  Vector3d state_vec = Vector3d::Identity();
-  Vector3d ref_vec   = 2.0 * Vector3d::Identity();
-  
+  Vector3d state_vec = Vector3d::Ones();
+  Vector3d ref_vec   = 2.0 * Vector3d::Ones();
+
   computeControl2(dt, state_vec, ref_vec);
   for (auto _ : state) {
     computeControl2(dt, state_vec, ref_vec);

@@ -10,8 +10,8 @@ using Vector3d = Eigen::Vector3d;
 using Matrix3d = Eigen::Matrix3d;
 
 Vector3d limitOutput1(const Vector3d &output,
-                     const Vector3d &limits,
-                     const bool &proportional_limitation) {
+                      const Vector3d &limits,
+                      const bool &proportional_limitation) {
   Vector3d limited_output = output;
 
   // Delimit the speed for each axis
@@ -38,8 +38,8 @@ Vector3d limitOutput1(const Vector3d &output,
 }
 
 Vector3d limitOutput2(const Vector3d &output,
-                     const Vector3d &limits,
-                     const bool &proportional_limitation) {
+                      const Vector3d &limits,
+                      const bool &proportional_limitation) {
   Vector3d limited_output = output;
 
   // Delimit the speed for each axis
@@ -66,8 +66,8 @@ Vector3d limitOutput2(const Vector3d &output,
 }
 
 static void BM_TEST_LIMITOUTPUT1(benchmark::State &state) {
-  Vector3d output = 2 * Vector3d::Identity();
-  Vector3d limits = Vector3d::Identity();
+  Vector3d output              = 2 * Vector3d::Ones();
+  Vector3d limits              = Vector3d::Ones();
   bool proportional_limitation = true;
   for (auto _ : state) {
     limitOutput1(output, limits, proportional_limitation);
@@ -76,8 +76,8 @@ static void BM_TEST_LIMITOUTPUT1(benchmark::State &state) {
 BENCHMARK(BM_TEST_LIMITOUTPUT1)->Threads(1)->Repetitions(20);
 
 static void BM_TEST_LIMITOUTPUT2(benchmark::State &state) {
-  Vector3d output = 2 * Vector3d::Identity();
-  Vector3d limits = Vector3d::Identity();
+  Vector3d output              = 2 * Vector3d::Ones();
+  Vector3d limits              = Vector3d::Ones();
   bool proportional_limitation = true;
   for (auto _ : state) {
     limitOutput2(output, limits, proportional_limitation);

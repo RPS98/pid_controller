@@ -9,8 +9,8 @@ using Matrix3d = Eigen::Matrix3d;
 
 static void BM_TEST(benchmark::State &state) {
   PIDController3D controller = PIDController3D();
-  Vector3d input           = Vector3d::Identity();
-  bool flag                = true;
+  Vector3d input             = Vector3d::Ones();
+  bool flag                  = true;
 
   controller.setGains(input, input, input);
   controller.setAntiWindup(input);
@@ -19,8 +19,8 @@ static void BM_TEST(benchmark::State &state) {
 
   double dt = 0.01;
 
-  Vector3d state_vec = Vector3d::Identity();
-  Vector3d ref_vec   = 2.0 * Vector3d::Identity();
+  Vector3d state_vec = Vector3d::Ones();
+  Vector3d ref_vec   = 2.0 * Vector3d::Ones();
   for (auto _ : state) {
     controller.computeControl(dt, state_vec, ref_vec);
   }

@@ -63,6 +63,11 @@ public:
                           const Vector3d &_state_dot,
                           const Vector3d &_reference_dot);
 
+  Vector3d computeControl(const Vector3d &_state,
+                          const Vector3d &_reference,
+                          const Vector3d &_state_dot,
+                          const Vector3d &_reference_dot);
+
   Vector3d computeControlWithSaturation(const double &_dt,
                                         const Vector3d &_state,
                                         const Vector3d &_reference,
