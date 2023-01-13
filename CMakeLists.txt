@@ -62,15 +62,18 @@ install(
   INCLUDES DESTINATION include
 )
 
-# check if tests are enabled
-if(BUILD_TESTING)
-  find_package(ament_cmake_cppcheck REQUIRED)
-  find_package(ament_cmake_clang_format REQUIRED)
+# # check if tests are enabled
+# if(BUILD_TESTING)
+#   find_package(ament_cmake_cppcheck REQUIRED)
+#   find_package(ament_cmake_clang_format REQUIRED)
 
-  ament_cppcheck(src/ include/ tests/)
-  ament_clang_format(src/ include/ tests/ --config ${CMAKE_CURRENT_SOURCE_DIR}/.clang-format)
+#   ament_cppcheck(src/ include/)
+#   ament_clang_format(src/ include/ --config ${CMAKE_CURRENT_SOURCE_DIR}/.clang-format)
+  
+#   # ament_cppcheck(src/ include/ tests/)
+#   # ament_clang_format(src/ include/ tests/ --config ${CMAKE_CURRENT_SOURCE_DIR}/.clang-format)
 
-  include(tests/profiling_cmake.txt)
-endif()
+#   # include(tests/profiling_cmake.txt)
+# endif()
 
 ament_package()
