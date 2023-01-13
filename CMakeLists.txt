@@ -63,17 +63,23 @@ install(
 )
 
 # # check if tests are enabled
-# if(BUILD_TESTING)
-#   find_package(ament_cmake_cppcheck REQUIRED)
-#   find_package(ament_cmake_clang_format REQUIRED)
+if(BUILD_TESTING)
+  find_package(ament_cmake_cppcheck REQUIRED)
+  find_package(ament_cmake_clang_format REQUIRED)
+  find_package(benchmark REQUIRED)
 
-#   ament_cppcheck(src/ include/)
-#   ament_clang_format(src/ include/ --config ${CMAKE_CURRENT_SOURCE_DIR}/.clang-format)
-  
-#   # ament_cppcheck(src/ include/ tests/)
-#   # ament_clang_format(src/ include/ tests/ --config ${CMAKE_CURRENT_SOURCE_DIR}/.clang-format)
+  ament_cppcheck(src/ include/ tests/)
+  ament_clang_format(src/ include/ tests/ --config ${CMAKE_CURRENT_SOURCE_DIR}/.clang-format)
 
-#   # include(tests/profiling_cmake.txt)
-# endif()
+  file(GLOB TEST_SOURCE "tests/*_benchmark.cpp")
+  foreach(TEST_FILE ${TEST_SOURCE})
+    get_filename_component(TEST_NAME ${TEST_FILE} NAME_WE)
+
+    add_executable(${PROJECT_NAME}_${TEST_NAME} ${TEST_FILE})
+    ament_target_dependencies(${PROJECT_NAME}_${TEST_NAME} ${PROJECT_DEPENDENCIES})
+    target_link_libraries(${PROJECT_NAME}_${TEST_NAME} benchmark ${PROJECT_NAME})
+  endforeach()
+
+endif()
 
 ament_package()

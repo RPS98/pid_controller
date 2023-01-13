@@ -7,7 +7,7 @@ PIDController::PIDController(const bool &verbose) { _verbose = verbose; };
 PIDController::~PIDController() {}
 
 void PIDController::setOutputSaturation(double saturation) {
-  if ((saturation == 0.0)) {
+  if (saturation == 0.0) {
     if (_verbose) {
       std::cout << "- PID-Error: Saturation must be greater than zero" << std::endl;
     }
