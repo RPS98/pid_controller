@@ -1,6 +1,6 @@
 #include <benchmark/benchmark.h>
-#include <pid_controller/PID_3D.hpp>
 #include <exception>
+#include <pid_controller/PID_3D.hpp>
 
 using namespace pid_controller;
 

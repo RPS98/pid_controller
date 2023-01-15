@@ -72,6 +72,7 @@ if(BUILD_TESTING)
   ament_clang_format(src/ include/ tests/ --config ${CMAKE_CURRENT_SOURCE_DIR}/.clang-format)
 
   file(GLOB TEST_SOURCE "tests/*_benchmark.cpp")
+
   foreach(TEST_FILE ${TEST_SOURCE})
     get_filename_component(TEST_NAME ${TEST_FILE} NAME_WE)
 
@@ -79,7 +80,6 @@ if(BUILD_TESTING)
     ament_target_dependencies(${PROJECT_NAME}_${TEST_NAME} ${PROJECT_DEPENDENCIES})
     target_link_libraries(${PROJECT_NAME}_${TEST_NAME} benchmark ${PROJECT_NAME})
   endforeach()
-
 endif()
 
 ament_package()
