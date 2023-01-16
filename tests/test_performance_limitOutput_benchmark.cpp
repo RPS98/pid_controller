@@ -85,9 +85,4 @@ static void BM_TEST_LIMITOUTPUT2(benchmark::State &state) {
 }
 BENCHMARK(BM_TEST_LIMITOUTPUT2)->Threads(1)->Repetitions(20);
 
-int main(int argc, char **argv) {
-  // benchmark::RegisterBenchmark("run Efficiciency", BM_TEST);
-  benchmark::Initialize(&argc, argv);
-  benchmark::RunSpecifiedBenchmarks();
-  benchmark::Shutdown();
-}
+BENCHMARK_MAIN();
