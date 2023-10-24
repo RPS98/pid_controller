@@ -27,13 +27,13 @@ include_directories(
   ${EIGEN3_INCLUDE_DIRS}
 )
 
-set(SOURCE_CPP_FILES
+set(SOURCE_HPP_FILES
   include/${PROJECT_NAME}/pid.hpp
   include/${PROJECT_NAME}/pid_1d.hpp
 )
 
 # Create library
-add_library(${PROJECT_NAME} SHARED ${SOURCE_CPP_FILES})
+add_library(${PROJECT_NAME} SHARED ${SOURCE_HPP_FILES})
 
 # Specify the language for the target as C++
 set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
@@ -44,10 +44,6 @@ target_include_directories(${PROJECT_NAME}
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include/${PROJECT_NAME}>
 )
-
-# Add main executable
-# add_executable(${PROJECT_NAME}_main src/${PROJECT_NAME}_main.cpp)
-# target_link_libraries(${PROJECT_NAME}_main ${PROJECT_NAME})
 
 # Tests
 include(CTest)

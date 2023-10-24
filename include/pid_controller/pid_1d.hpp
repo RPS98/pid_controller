@@ -42,21 +42,26 @@
 
 namespace pid_1d_controller {
 
-template <typename T = double>
+template <typename P = double>
 struct PIDParams {
+  static_assert(std::is_floating_point<P>::value,
+                "MotorParams must be used with a floating-point type");
+
+  using Scalar = P;
+
   // PID gains
-  T Kp_gains = 0.0;  // Proportional gains
-  T Ki_gains = 0.0;  // Integral gains
-  T Kd_gains = 0.0;  // Derivative gains
+  Scalar Kp_gains = 0.0;  // Proportional gains
+  Scalar Ki_gains = 0.0;  // Integral gains
+  Scalar Kd_gains = 0.0;  // Derivative gains
 
   // PID params
-  T antiwindup_cte         = 0.0;    // Integral anti-windup
-  T alpha                  = 0.0;    // Derivative filter
+  Scalar antiwindup_cte    = 0.0;    // Integral anti-windup
+  Scalar alpha             = 0.0;    // Derivative filter
   bool reset_integral_flag = false;  // Reset integral flag when error sign changes
 
   // PID Output saturation
-  T upper_output_saturation = 0.0;  // Upper output saturation
-  T lower_output_saturation = 0.0;  // Lower output saturation
+  Scalar upper_output_saturation = 0.0;  // Upper output saturation
+  Scalar lower_output_saturation = 0.0;  // Lower output saturation
 };
 
 /**
@@ -64,17 +69,22 @@ struct PIDParams {
  *
  * PID 1 dimension controller. It can be used to control any 1D system.
  *
- * @tparam T Precision
+ * @tparam P Precision
  */
-template <typename T = double>
+template <typename P = double>
 class PID {
+  static_assert(std::is_floating_point<P>::value,
+                "MotorParams must be used with a floating-point type");
+  using Scalar = P;
+
 public:
   /**
    * @brief Construct a new pid
    *
    * @param verbose Verbosity flag. Default: false
    */
-  PID(const PIDParams<T> &pid_params, const bool &verbose = false) : verbose_(verbose) {
+  PID(const PIDParams<P> &pid_params = PIDParams<P>(), const bool &verbose = false)
+      : verbose_(verbose) {
     update_params(pid_params);
     reset_controller();
   };
@@ -85,25 +95,25 @@ private:
   bool verbose_ = false;  // Verbosity flag
 
   // PID gains
-  T Kp_ = 0.0;
-  T Ki_ = 0.0;
-  T Kd_ = 0.0;
+  Scalar Kp_ = 0.0;
+  Scalar Ki_ = 0.0;
+  Scalar Kd_ = 0.0;
 
   // PID params
-  T antiwindup_cte_         = 0.0;    // Integral anti-windup
-  T alpha_                  = 0.0;    // Derivative filter
+  Scalar antiwindup_cte_    = 0.0;    // Integral anti-windup
+  Scalar alpha_             = 0.0;    // Derivative filter
   bool reset_integral_flag_ = false;  // Reset integral flag when error sign changes
 
   // PID Output saturation
-  bool saturation_flag_      = false;  // Output saturation flag
-  T upper_output_saturation_ = 0.0;
-  T lower_output_saturation_ = 0.0;
+  bool saturation_flag_           = false;  // Output saturation flag
+  Scalar upper_output_saturation_ = 0.0;
+  Scalar lower_output_saturation_ = 0.0;
 
   // PID state
-  bool first_run_            = true;  // First run flag
-  T integral_accum_error_    = 0.0;   // Integral accumulator error
-  T last_proportional_error_ = 0.0;   // Last proportional error
-  T filtered_derivate_error_ = 0.0;   // Filtered derivative error
+  bool first_run_                 = true;  // First run flag
+  Scalar integral_accum_error_    = 0.0;   // Integral accumulator error
+  Scalar last_proportional_error_ = 0.0;   // Last proportional error
+  Scalar filtered_derivate_error_ = 0.0;   // Filtered derivative error
 
 public:
   // Public methods
@@ -113,7 +123,7 @@ public:
    *
    * @param params PIDParams struct
    */
-  void update_params(const PIDParams<T> &params) {
+  void update_params(const PIDParams<P> &params) {
     set_gains(params.Kp_gains, params.Ki_gains, params.Kd_gains);
     set_anti_windup(params.antiwindup_cte);
     set_alpha(params.alpha);
@@ -139,7 +149,7 @@ public:
    * @param upper_saturation Upper saturation
    * @param lower_saturation Lower saturation
    */
-  void set_output_saturation(const T upper_saturation, const T lower_saturation) {
+  void set_output_saturation(const Scalar upper_saturation, const Scalar lower_saturation) {
     assert(upper_saturation > lower_saturation);
     upper_output_saturation_ = upper_saturation;
     lower_output_saturation_ = lower_saturation;
@@ -162,9 +172,9 @@ public:
    *
    * @param state Current state
    * @param reference Reference state
-   * @return T Error
+   * @return Scalar Error
    */
-  static inline T get_error(const T state, const T reference) {
+  static inline Scalar get_error(const Scalar state, const Scalar reference) {
     // Compute proportional error
     return reference - state;
   }
@@ -179,12 +189,12 @@ public:
    * @param proportional_error Output proportional error
    * @param derivative_error Output derivative error
    */
-  static inline void get_error(const T state,
-                               const T reference,
-                               const T state_dot,
-                               const T reference_dot,
-                               T &proportional_error,
-                               T &derivative_error) {
+  static inline void get_error(const Scalar state,
+                               const Scalar reference,
+                               const Scalar state_dot,
+                               const Scalar reference_dot,
+                               Scalar &proportional_error,
+                               Scalar &derivative_error) {
     // Compute proportional error
     proportional_error = reference - state;
 
@@ -199,7 +209,7 @@ public:
    * @param proportional_error Proportional error
    * @return PID output
    */
-  T compute_control(const T dt, const T proportional_error) {
+  Scalar compute_control(const Scalar dt, const Scalar proportional_error) {
     // Initialize values for the integral and derivative contributions
     if (first_run_) {
       first_run_               = false;
@@ -209,17 +219,17 @@ public:
     }
 
     // Compute the proportional contribution
-    T proportional_error_contribution = Kp_ * proportional_error;
+    Scalar proportional_error_contribution = Kp_ * proportional_error;
 
     // Compute de integral contribution (position integrate)
-    T integral_error_contribution = compute_integral_contribution(dt, proportional_error);
+    Scalar integral_error_contribution = compute_integral_contribution(dt, proportional_error);
 
     // Compute the derivate contribution
-    T derivate_error_contribution =
+    Scalar derivate_error_contribution =
         compute_derivative_contribution_by_deriving(dt, proportional_error);
 
     // Compute output speed
-    T output =
+    Scalar output =
         proportional_error_contribution + integral_error_contribution + derivate_error_contribution;
 
     if (saturation_flag_) {
@@ -236,7 +246,9 @@ public:
    * @param derivative_error = Derivative error
    * @return PID output
    */
-  T computeControl(const T dt, const T proportional_error, const T derivative_error) {
+  Scalar computeControl(const Scalar dt,
+                        const Scalar proportional_error,
+                        const Scalar derivative_error) {
     // Initialize values for the integral and derivative contributions
     if (first_run_) {
       first_run_               = false;
@@ -246,17 +258,17 @@ public:
     }
 
     // Compute the proportional contribution
-    T proportional_error_contribution = Kp_ * proportional_error;
+    Scalar proportional_error_contribution = Kp_ * proportional_error;
 
     // // Compute de integral contribution (position integrate)
-    T integral_error_contribution = compute_integral_contribution(dt, proportional_error);
+    Scalar integral_error_contribution = compute_integral_contribution(dt, proportional_error);
 
     // // Compute the derivate contribution
-    T derivate_error_contribution =
+    Scalar derivate_error_contribution =
         compute_derivative_contribution(dt, proportional_error, derivative_error);
 
     // Compute output speed
-    T output =
+    Scalar output =
         proportional_error_contribution + integral_error_contribution + derivate_error_contribution;
 
     if (saturation_flag_) {
@@ -277,7 +289,9 @@ public:
    * @param lower_limits Lower limits vector
    * @return Saturated value
    */
-  static inline T saturate_output(const T output, const T upper_limits, const T lower_limits) {
+  static inline Scalar saturate_output(const Scalar output,
+                                       const Scalar upper_limits,
+                                       const Scalar lower_limits) {
     // With std::clamp
     return std::clamp(output, lower_limits, upper_limits);
   }
@@ -287,10 +301,10 @@ public:
   /**
    * @brief Get the params
    *
-   * @return PIDParams<T> PID parameters
+   * @return PIDParams<P> PID parameters
    */
-  PIDParams<T> get_params() const {
-    PIDParams<T> params;
+  PIDParams<P> get_params() const {
+    PIDParams<P> params;
     get_gains(params.Kp_gains, params.Ki_gains, params.Kd_gains);
     params.antiwindup_cte      = get_anti_windup();
     params.alpha               = get_alpha();
@@ -306,7 +320,7 @@ public:
    * @param ki Integral gain
    * @param kd Derivative gain
    */
-  inline void set_gains(T kp, T ki, T kd) {
+  inline void set_gains(Scalar kp, Scalar ki, Scalar kd) {
     Kp_ = kp;
     Ki_ = ki;
     Kd_ = kd;
@@ -319,7 +333,7 @@ public:
    * @param ki Integral gain
    * @param kd Derivative gain
    */
-  inline void get_gains(T &kp, T &ki, T &kd) const {
+  inline void get_gains(Scalar &kp, Scalar &ki, Scalar &kd) const {
     kp = Kp_;
     ki = Ki_;
     kd = Kd_;
@@ -330,70 +344,70 @@ public:
    *
    * @param kp Proportional gain
    */
-  inline void set_kp(T kp) { Kp_ = kp; }
+  inline void set_kp(Scalar kp) { Kp_ = kp; }
 
   /**
    * @brief Get the Proportional Gain of the controller
    *
-   * @return T Proportional gain
+   * @return Scalar Proportional gain
    */
-  inline T get_kp() const { return Kp_; }
+  inline Scalar get_kp() const { return Kp_; }
 
   /**
    * @brief Set the Integral Gain of the controller
    *
    * @param ki Integral gain
    */
-  inline void set_ki(T ki) { Ki_ = ki; }
+  inline void set_ki(Scalar ki) { Ki_ = ki; }
 
   /**
    * @brief Get the Integral Gain of the controller
    *
-   * @return T Integral gain
+   * @return Scalar Integral gain
    */
-  inline T get_ki() const { return Ki_; }
+  inline Scalar get_ki() const { return Ki_; }
 
   /**
    * @brief Set the Derivative Gain of the controller
    *
    * @param kd Derivative gain
    */
-  inline void set_kd(T kd) { Kd_ = kd; }
+  inline void set_kd(Scalar kd) { Kd_ = kd; }
 
   /**
    * @brief Get the Derivative Gain of the controller
    *
-   * @return T Derivative gain
+   * @return Scalar Derivative gain
    */
-  inline T get_kd() const { return Kd_; }
+  inline Scalar get_kd() const { return Kd_; }
 
   /**
    * @brief Set the Anti Windup of the controller
    *
    * @param anti_windup Anti windup
    */
-  inline void set_anti_windup(T anti_windup) { antiwindup_cte_ = anti_windup; }
+  inline void set_anti_windup(Scalar anti_windup) { antiwindup_cte_ = anti_windup; }
 
   /**
    * @brief Get the Anti Windup of the controller
    *
-   * @return T Anti windup
+   * @return Scalar Anti windup
    */
-  inline T get_anti_windup() const { return antiwindup_cte_; }
+  inline Scalar get_anti_windup() const { return antiwindup_cte_; }
 
   /**
    * @brief Set the Alpha of the controller
    *
    * @param alpha Alpha
    */
-  inline void set_alpha(T alpha) { alpha_ = alpha; }
+  inline void set_alpha(Scalar alpha) { alpha_ = alpha; }
 
   /**
    * @brief Get the Alpha of the controller
    *
-   * @return T Alpha
+   * @return Scalar Alpha
    */
-  inline T get_alpha() const { return alpha_; }
+  inline Scalar get_alpha() const { return alpha_; }
 
   /**
    * @brief Set the Reset Integral Saturation Flag of the controller
@@ -415,7 +429,7 @@ public:
    * integral error is grater than the anti windup and the sign of the integral
    * error is different from the sign of the proportional error.
    *
-   * @return true Reset integral saturation flag is enabled
+   * @return Scalarrue Reset integral saturation flag is enabled
    * @return false Reset integral saturation flag is disabled
    */
   inline bool get_reset_integral_saturation_flag() const { return reset_integral_flag_; }
@@ -426,7 +440,7 @@ public:
    * @param upper_limit Upper limit
    * @param lower_limit Lower limit
    */
-  inline void get_saturation_limits(T &upper_limit, T &lower_limit) const {
+  inline void get_saturation_limits(Scalar &upper_limit, Scalar &lower_limit) const {
     upper_limit = upper_output_saturation_;
     lower_limit = lower_output_saturation_;
   }
@@ -434,7 +448,7 @@ public:
   /**
    * @brief Get the output saturation flag
    *
-   * @return true Saturation is enabled
+   * @return Scalarrue Saturation is enabled
    * @return false Saturation is disabled
    */
   inline bool get_output_saturation_flag() const { return saturation_flag_; };
@@ -445,9 +459,9 @@ protected:
    *
    * @param dt Delta time (s)
    * @param proportional_error Proportional error
-   * @return T Integral contribution
+   * @return Scalar Integral contribution
    */
-  T compute_integral_contribution(const T dt, const T proportional_error) {
+  Scalar compute_integral_contribution(const Scalar dt, const Scalar proportional_error) {
     // If sing of the error changes and the integrator is saturated, reset the
     // integral for each axis
     if (reset_integral_flag_ != 0) {
@@ -468,7 +482,7 @@ protected:
     }
 
     // Compute de integral contribution
-    T integral_error_contribution = Ki_ * integral_accum_error_;
+    Scalar integral_error_contribution = Ki_ * integral_accum_error_;
     return integral_error_contribution;
   }
 
@@ -479,16 +493,17 @@ protected:
    * @param proportional_error Proportional error
    * @return Derivative contribution
    */
-  T compute_derivative_contribution_by_deriving(const T dt, const T proportional_error) {
+  Scalar compute_derivative_contribution_by_deriving(const Scalar dt,
+                                                     const Scalar proportional_error) {
     // Compute the derivative contribution of the error filtered with a first
     // order filter
-    T proportional_error_increment = (proportional_error - last_proportional_error_);
+    Scalar proportional_error_increment = (proportional_error - last_proportional_error_);
 
     filtered_derivate_error_ =
         alpha_ * proportional_error_increment + (1.0 - alpha_) * filtered_derivate_error_;
 
     // Compute the derivate contribution
-    T derivate_error_contribution = Kd_ * filtered_derivate_error_ / dt;
+    Scalar derivate_error_contribution = Kd_ * filtered_derivate_error_ / dt;
     return derivate_error_contribution;
   }
 
@@ -503,9 +518,9 @@ protected:
    * @param reference_dot Reference derivative
    * @return Derivative contribution
    */
-  T compute_derivative_contribution(const T dt, const T derivate_error) {
+  Scalar compute_derivative_contribution(const Scalar dt, const Scalar derivate_error) {
     // Compute the derivate contribution
-    T derivate_error_contribution = Kd_ * derivate_error / dt;
+    Scalar derivate_error_contribution = Kd_ * derivate_error / dt;
     return derivate_error_contribution;
   }
 };

@@ -41,10 +41,14 @@
 
 namespace pid_controller {
 
-template <typename T = double, int dim = 3>
+template <typename P = double, int dim = 3>
 struct PIDParams {
-  using Vector = Eigen::Vector<T, dim>;
-  using Matrix = Eigen::Matrix<T, dim, dim>;
+  static_assert(std::is_floating_point<P>::value,
+                "MotorParams must be used with a floating-point type");
+  static_assert(dim > 0, "MotorParams must be used with a positive dimension");
+
+  using Vector = Eigen::Vector<P, dim>;
+  using Matrix = Eigen::Matrix<P, dim, dim>;
 
   // PID gains
   Vector Kp_gains = Vector::Zero();  // Proportional gains
@@ -65,21 +69,27 @@ struct PIDParams {
 /**
  * @brief PID controller
  *
- * @tparam T Precision
+ * @tparam P Precision
  * @tparam dim Dimension
  */
-template <typename T = double, int dim = 3>
+template <typename P = double, int dim = 3>
 class PID {
-public:
-  using Vector = Eigen::Vector<T, dim>;
-  using Matrix = Eigen::Matrix<T, dim, dim>;
+  static_assert(std::is_floating_point<P>::value,
+                "MotorParams must be used with a floating-point type");
+  static_assert(dim > 0, "MotorParams must be used with a positive dimension");
 
+  using Scalar = P;
+  using Vector = Eigen::Vector<P, dim>;
+  using Matrix = Eigen::Matrix<P, dim, dim>;
+
+public:
   /**
    * @brief Construct a new PID
    *
    * @param verbose Verbosity flag. Default: false
    */
-  PID(const PIDParams<T, dim> &pid_params, const bool &verbose = false) : verbose_(verbose) {
+  PID(const PIDParams<P, dim> &pid_params = PIDParams<P, dim>(), const bool &verbose = false)
+      : verbose_(verbose) {
     update_params(pid_params);
     reset_controller();
   };
@@ -119,15 +129,15 @@ public:
    *
    * @param params PIDParams struct
    */
-  void update_params(const PIDParams<T, dim> &params) {
+  void update_params(const PIDParams<P, dim> &params) {
     set_gains(params.Kp_gains, params.Ki_gains, params.Kd_gains);
     set_anti_windup(params.antiwindup_cte);
     set_alpha(params.alpha);
     set_reset_integral_saturation_flag(params.reset_integral_flag);
     set_proportional_saturation_flag(params.proportional_saturation_flag);
 
-    if (params.lower_output_saturation != Eigen::Vector<T, dim>::Zero() ||
-        params.upper_output_saturation != Eigen::Vector<T, dim>::Zero()) {
+    if (params.lower_output_saturation != Eigen::Vector<P, dim>::Zero() ||
+        params.upper_output_saturation != Eigen::Vector<P, dim>::Zero()) {
       set_output_saturation(params.upper_output_saturation, params.lower_output_saturation,
                             params.proportional_saturation_flag);
     } else {
@@ -218,7 +228,7 @@ public:
    * @param proportional_error Proportional error
    * @return Vector PID output
    */
-  Vector compute_control(const T dt, const Vector &proportional_error) {
+  Vector compute_control(const Scalar dt, const Vector &proportional_error) {
     // Initialize values for the integral and derivative contributions
     if (first_run_) {
       first_run_               = false;
@@ -265,7 +275,7 @@ public:
    * @param reference_dot Reference state derivative
    * @return Vector
    */
-  Vector compute_control(const T dt,
+  Vector compute_control(const Scalar dt,
                          const Vector &proportional_error,
                          const Vector &derivative_error) {
     // Initialize values for the integral and derivative contributions
@@ -334,7 +344,7 @@ public:
     }
 
     // Proportional saturation
-    T factor = 1.0;
+    Scalar factor = 1.0;
     for (int j = 0; j < saturated_output.size(); j++) {
       factor = 1.0;
       if (saturated_output[j] > upper_limits[j]) {
@@ -352,10 +362,10 @@ public:
   /**
    * @brief Get the params
    *
-   * @return PIDParams<T, dim> PID parameters
+   * @return PIDParams<P, dim> PID parameters
    */
-  PIDParams<T, dim> get_params() const {
-    PIDParams<T, dim> params;
+  PIDParams<P, dim> get_params() const {
+    PIDParams<P, dim> params;
     get_gains(params.Kp_gains, params.Ki_gains, params.Kd_gains);
     params.antiwindup_cte               = get_anti_windup();
     params.alpha                        = get_alpha();
@@ -548,7 +558,7 @@ protected:
    * @param proportional_error Proportional error
    * @return Vector Integral contribution
    */
-  Vector compute_integral_contribution(const T dt, const Vector &proportional_error) {
+  Vector compute_integral_contribution(const Scalar dt, const Vector &proportional_error) {
     // If sing of the error changes and the integrator is saturated, reset the integral for each
     // axis
     if (reset_integral_flag_ != 0) {
@@ -582,7 +592,8 @@ protected:
    * @param proportional_error Proportional error
    * @return Vector Derivative contribution
    */
-  Vector compute_derivative_contribution_by_deriving(const T dt, const Vector &proportional_error) {
+  Vector compute_derivative_contribution_by_deriving(const Scalar dt,
+                                                     const Vector &proportional_error) {
     // Compute the derivative contribution of the error filtered with a first
     // order filter
     Vector proportional_error_increment = (proportional_error - last_proportional_error_);
@@ -606,7 +617,7 @@ protected:
    * @param reference_dot Reference derivative
    * @return Vector Derivative contribution
    */
-  Vector compute_derivative_contribution(const T dt, const Vector &derivate_error) {
+  Vector compute_derivative_contribution(const Scalar dt, const Vector &derivate_error) {
     // Compute the derivate contribution
     Vector derivate_error_contribution = Kd_lin_mat_ * derivate_error / dt;
     return derivate_error_contribution;

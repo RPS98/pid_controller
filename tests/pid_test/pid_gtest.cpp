@@ -102,7 +102,9 @@ protected:
   double dt        = 0.1;
 };
 
-TEST_F(PIDTest, DefaultConstructor) {
+TEST_F(PIDTest, DefaultConstructor) { PID pid_out = PID(); }
+
+TEST_F(PIDTest, DefaultConstructor2) {
   PIDParams pid_params_out;
   PID pid_out(pid_params_out);
 }
