@@ -293,7 +293,7 @@ public:
     Vector integral_error_contribution = compute_integral_contribution(dt, proportional_error);
 
     // Compute the derivate contribution
-    Vector derivate_error_contribution = compute_derivative_contribution(dt, derivative_error);
+    Vector derivate_error_contribution = compute_derivative_contribution(derivative_error);
 
     // Compute output
     Vector output =
@@ -596,13 +596,14 @@ protected:
                                                      const Vector &proportional_error) {
     // Compute the derivative contribution of the error filtered with a first
     // order filter
-    Vector proportional_error_increment = (proportional_error - last_proportional_error_);
+    Vector derivate_proportional_error_increment =
+        (proportional_error - last_proportional_error_) / dt;
 
-    filtered_derivate_error_ = alpha_.cwiseProduct(proportional_error_increment) +
+    filtered_derivate_error_ = alpha_.cwiseProduct(derivate_proportional_error_increment) +
                                (Vector::Ones() - alpha_).cwiseProduct(filtered_derivate_error_);
 
     // Compute the derivate contribution
-    Vector derivate_error_contribution = Kd_lin_mat_ * filtered_derivate_error_ / dt;
+    Vector derivate_error_contribution = compute_derivative_contribution(filtered_derivate_error_);
     return derivate_error_contribution;
   }
 
@@ -612,17 +613,16 @@ protected:
    * For controllers with derivative feedback, the derivative contribution is computed using the
    * state and reference derivatives.
    *
-   * @param dt Delta time (s)
    * @param state_dot State derivative
    * @param reference_dot Reference derivative
    * @return Vector Derivative contribution
    */
-  Vector compute_derivative_contribution(const Scalar dt, const Vector &derivate_error) {
-    // Compute the derivate contribution
-    Vector derivate_error_contribution = Kd_lin_mat_ * derivate_error / dt;
-    return derivate_error_contribution;
-  }
-};
+  inline Vector compute_derivative_contribution(const Vector &derivate_error) {
+      // Compute the derivate contribution
+      Vector derivate_error_contribution = Kd_lin_mat_ * derivate_error;
+  return derivate_error_contribution;
+}
+};  // namespace pid_controller
 }  // namespace pid_controller
 
 #endif  // PID_CONTROLLER_HPP

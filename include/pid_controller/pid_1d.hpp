@@ -246,7 +246,7 @@ public:
    * @param derivative_error = Derivative error
    * @return PID output
    */
-  Scalar computeControl(const Scalar dt,
+  Scalar compute_control(const Scalar dt,
                         const Scalar proportional_error,
                         const Scalar derivative_error) {
     // Initialize values for the integral and derivative contributions
@@ -264,8 +264,7 @@ public:
     Scalar integral_error_contribution = compute_integral_contribution(dt, proportional_error);
 
     // // Compute the derivate contribution
-    Scalar derivate_error_contribution =
-        compute_derivative_contribution(dt, proportional_error, derivative_error);
+    Scalar derivate_error_contribution = compute_derivative_contribution(derivative_error);
 
     // Compute output speed
     Scalar output =
@@ -497,13 +496,14 @@ protected:
                                                      const Scalar proportional_error) {
     // Compute the derivative contribution of the error filtered with a first
     // order filter
-    Scalar proportional_error_increment = (proportional_error - last_proportional_error_);
+    Scalar derivate_proportional_error_increment =
+        (proportional_error - last_proportional_error_) / dt;
 
     filtered_derivate_error_ =
-        alpha_ * proportional_error_increment + (1.0 - alpha_) * filtered_derivate_error_;
+        alpha_ * derivate_proportional_error_increment + (1.0 - alpha_) * filtered_derivate_error_;
 
     // Compute the derivate contribution
-    Scalar derivate_error_contribution = Kd_ * filtered_derivate_error_ / dt;
+    Scalar derivate_error_contribution = compute_derivative_contribution(filtered_derivate_error_);
     return derivate_error_contribution;
   }
 
@@ -513,14 +513,13 @@ protected:
    * For controllers with derivative feedback, the derivative contribution is
    * computed using the state and reference derivatives.
    *
-   * @param dt Delta time (s)
    * @param state_dot State derivative
    * @param reference_dot Reference derivative
    * @return Derivative contribution
    */
-  Scalar compute_derivative_contribution(const Scalar dt, const Scalar derivate_error) {
+  inline Scalar compute_derivative_contribution(const Scalar derivate_error) {
     // Compute the derivate contribution
-    Scalar derivate_error_contribution = Kd_ * derivate_error / dt;
+    Scalar derivate_error_contribution = Kd_ * derivate_error;
     return derivate_error_contribution;
   }
 };

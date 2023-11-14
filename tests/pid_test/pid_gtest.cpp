@@ -102,14 +102,13 @@ protected:
   double dt        = 0.1;
 };
 
-TEST_F(PIDTest, DefaultConstructor) { PID pid_out = PID(); }
-
-TEST_F(PIDTest, DefaultConstructor2) {
+TEST_F(PIDTest, default_constructors) {
+  EXPECT_NO_THROW(PID pid_out = PID());
   PIDParams pid_params_out;
-  PID pid_out(pid_params_out);
+  EXPECT_NO_THROW(PID pid_out2 = PID(pid_params_out));
 }
 
-TEST_F(PIDTest, Constructor) {
+TEST_F(PIDTest, constructor) {
   // Check public methods
   PIDParams<double, 3> pid_params_out = pid->get_params();
   EXPECT_EQ(pid_params_out.Kp_gains, pid_params.Kp_gains);
@@ -133,7 +132,7 @@ TEST_F(PIDTest, Constructor) {
   EXPECT_EQ(pid_out.get_params().upper_output_saturation, pid_params_out.upper_output_saturation);
 }
 
-TEST_F(PIDTest, Constructor_Saturation_check) {
+TEST_F(PIDTest, constructor_saturation_check) {
   EXPECT_FALSE(pid->get_output_saturation_flag());
 
   pid_params.upper_output_saturation = Vector::Ones();
@@ -145,7 +144,20 @@ TEST_F(PIDTest, Constructor_Saturation_check) {
   EXPECT_FALSE(pid->get_output_saturation_flag());
 }
 
-TEST_F(PIDTest, ComputeControlKp) {
+TEST_F(PIDTest, public_methods) {
+  state = Eigen::Vector3d::Zero();
+
+  // Check positive error
+  reference = Eigen::Vector3d::Ones();
+  error     = pid->get_error(state, reference);
+  EXPECT_NO_THROW(pid->compute_control(dt, error));
+  EXPECT_NO_THROW(pid->compute_control(dt, error, error));
+
+  output = pid->compute_control(dt, error);
+  EXPECT_EQ(output, pid_params.Kp_gains.asDiagonal() * error);
+}
+
+TEST_F(PIDTest, compute_control_kp) {
   state = Eigen::Vector3d::Zero();
 
   // Check positive error
@@ -188,7 +200,7 @@ TEST_F(PIDTest, ComputeControlKp) {
   EXPECT_EQ(output, Eigen::Vector3d(0.5, 1.5, -2.0));
 }
 
-TEST_F(PIDTest, ComputeControlKi) {
+TEST_F(PIDTest, compute_control_ki) {
   Kp_gains            = Vector::Zero();
   Ki_gains            = Vector::Ones();
   Kd_gains            = Vector::Zero();
@@ -239,7 +251,7 @@ TEST_F(PIDTest, ComputeControlKi) {
   reset_controller();
 }
 
-TEST_F(PIDTest, ComputeControlKd) {
+TEST_F(PIDTest, compute_control_kd) {
   Kp_gains            = Vector::Zero();
   Ki_gains            = Vector::Zero();
   Kd_gains            = Vector::Ones();
