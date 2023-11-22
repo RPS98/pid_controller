@@ -32,16 +32,15 @@
  ********************************************************************************/
 
 #include <benchmark/benchmark.h>
-#include <exception>
-
 #include <math.h>
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
+#include <exception>
 #include <iostream>
 
 #include "pid_controller/pid.hpp"
 
-using namespace pid_controller;
+namespace pid_controller {
 
 using Vector = Eigen::Vector3d;
 using Matrix = Eigen::Matrix3d;
@@ -72,5 +71,7 @@ static void BM_TEST(benchmark::State &b_state) {
   }
 }
 BENCHMARK(BM_TEST)->Threads(1)->Repetitions(10);
+
+}  // namespace pid_controller
 
 BENCHMARK_MAIN();

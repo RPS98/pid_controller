@@ -31,8 +31,8 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ********************************************************************************/
 
-#ifndef PID_CONTROLLER_HPP
-#define PID_CONTROLLER_HPP
+#ifndef PID_CONTROLLER_PID_HPP_
+#define PID_CONTROLLER_PID_HPP_
 
 #include <math.h>
 #include <Eigen/Dense>
@@ -88,13 +88,14 @@ public:
    *
    * @param verbose Verbosity flag. Default: false
    */
-  PID(const PIDParams<P, dim> &pid_params = PIDParams<P, dim>(), const bool &verbose = false)
+  explicit PID(const PIDParams<P, dim> &pid_params = PIDParams<P, dim>(),
+               const bool &verbose                 = false)
       : verbose_(verbose) {
     update_params(pid_params);
     reset_controller();
-  };
+  }
 
-  ~PID(){};
+  ~PID() {}
 
 protected:
   bool verbose_ = false;  // Verbosity flag
@@ -333,7 +334,7 @@ public:
 
     // Non proportional saturation
     if (!proportional_saturation) {
-      for (short j = 0; j < output.size(); j++) {
+      for (int j = 0; j < output.size(); j++) {
         if (output[j] > upper_limits[j]) {
           saturated_output[j] = upper_limits[j];
         } else if (output[j] < lower_limits[j]) {
@@ -386,7 +387,7 @@ public:
     Kp_lin_mat_ = kp.asDiagonal();
     Ki_lin_mat_ = ki.asDiagonal();
     Kd_lin_mat_ = kd.asDiagonal();
-  };
+  }
 
   /**
    * @brief Get the gains
@@ -399,49 +400,49 @@ public:
     kp = Kp_lin_mat_.diagonal();
     ki = Ki_lin_mat_.diagonal();
     kd = Kd_lin_mat_.diagonal();
-  };
+  }
 
   /**
    * @brief Set the gains kp
    *
    * @param kp Proportional gain
    */
-  inline void set_gains_kp(const Vector &kp) { Kp_lin_mat_ = kp.asDiagonal(); };
+  inline void set_gains_kp(const Vector &kp) { Kp_lin_mat_ = kp.asDiagonal(); }
 
   /**
    * @brief Get the gains kp
    *
    * @param kp Proportional gain
    */
-  inline Vector get_gains_kp() const { return Kp_lin_mat_.diagonal(); };
+  inline Vector get_gains_kp() const { return Kp_lin_mat_.diagonal(); }
 
   /**
    * @brief Set the gains ki
    *
    * @param ki Integral gain
    */
-  inline void set_gains_ki(const Vector &ki) { Ki_lin_mat_ = ki.asDiagonal(); };
+  inline void set_gains_ki(const Vector &ki) { Ki_lin_mat_ = ki.asDiagonal(); }
 
   /**
    * @brief Get the gains ki
    *
    * @param ki Integral gain
    */
-  inline Vector get_gains_ki() const { return Ki_lin_mat_.diagonal(); };
+  inline Vector get_gains_ki() const { return Ki_lin_mat_.diagonal(); }
 
   /**
    * @brief Set the gains kd
    *
    * @param kd Derivative gain
    */
-  inline void set_gains_kd(const Vector &kd) { Kd_lin_mat_ = kd.asDiagonal(); };
+  inline void set_gains_kd(const Vector &kd) { Kd_lin_mat_ = kd.asDiagonal(); }
 
   /**
    * @brief Get the gains kd
    *
    * @param kd Derivative gain
    */
-  inline Vector get_gains_kd() const { return Kd_lin_mat_.diagonal(); };
+  inline Vector get_gains_kd() const { return Kd_lin_mat_.diagonal(); }
 
   /**
    * @brief Set the anti windup
@@ -452,7 +453,7 @@ public:
    *
    * @param anti_windup Anti windup
    */
-  inline void set_anti_windup(const Vector &anti_windup) { antiwindup_cte_ = anti_windup; };
+  inline void set_anti_windup(const Vector &anti_windup) { antiwindup_cte_ = anti_windup; }
 
   /**
    * @brief Get the anti windup
@@ -463,7 +464,7 @@ public:
    *
    * @param anti_windup Anti windup
    */
-  inline Vector get_anti_windup() const { return antiwindup_cte_; };
+  inline Vector get_anti_windup() const { return antiwindup_cte_; }
 
   /**
    * @brief Set the alpha
@@ -473,7 +474,7 @@ public:
    *
    * @param alpha Alpha in (0, 1]
    */
-  inline void set_alpha(const Vector alpha) { alpha_ = alpha; };
+  inline void set_alpha(const Vector alpha) { alpha_ = alpha; }
 
   /**
    * @brief Get the alpha
@@ -483,7 +484,7 @@ public:
    *
    * @param alpha Alpha in (0, 1]
    */
-  inline Vector get_alpha() const { return alpha_; };
+  inline Vector get_alpha() const { return alpha_; }
 
   /**
    * @brief Set the reset integral saturation flag
@@ -496,7 +497,7 @@ public:
    */
   inline void set_reset_integral_saturation_flag(bool reset_integral_flag) {
     reset_integral_flag_ = reset_integral_flag;
-  };
+  }
 
   /**
    * @brief Get the reset integral saturation flag
@@ -507,7 +508,7 @@ public:
    *
    * @param reset_integral_flag Reset integral saturation flag
    */
-  inline bool get_reset_integral_saturation_flag() const { return reset_integral_flag_; };
+  inline bool get_reset_integral_saturation_flag() const { return reset_integral_flag_; }
 
   /**
    * @brief Set the proportional saturation flag
@@ -519,7 +520,7 @@ public:
    */
   inline void set_proportional_saturation_flag(bool proportional_saturation_flag) {
     proportional_saturation_flag_ = proportional_saturation_flag;
-  };
+  }
 
   /**
    * @brief Get the proportional saturation flag
@@ -529,7 +530,7 @@ public:
    *
    * @param proportional_saturation_flag Proportional saturation flag
    */
-  inline bool get_proportional_saturation_flag() const { return proportional_saturation_flag_; };
+  inline bool get_proportional_saturation_flag() const { return proportional_saturation_flag_; }
 
   /**
    * @brief Get the saturation limits
@@ -540,7 +541,7 @@ public:
                                     Vector &saturation_lower_limit) const {
     saturation_upper_limit = upper_output_saturation_;
     saturation_lower_limit = lower_output_saturation_;
-  };
+  }
 
   /**
    * @brief Get the output saturation flag
@@ -548,7 +549,7 @@ public:
    * @return true Saturation is enabled
    * @return false Saturation is disabled
    */
-  inline bool get_output_saturation_flag() const { return saturation_flag_; };
+  inline bool get_output_saturation_flag() const { return saturation_flag_; }
 
 protected:
   /**
@@ -562,7 +563,7 @@ protected:
     // If sing of the error changes and the integrator is saturated, reset the integral for each
     // axis
     if (reset_integral_flag_ != 0) {
-      for (short j = 0; j < proportional_error.size(); j++) {
+      for (int j = 0; j < proportional_error.size(); j++) {
         if (std::abs(integral_accum_error_[j]) > antiwindup_cte_[j]) {
           if (std::signbit(integral_accum_error_[j]) != std::signbit(proportional_error[j])) {
             integral_accum_error_[j] = 0.0;
@@ -618,11 +619,12 @@ protected:
    * @return Vector Derivative contribution
    */
   inline Vector compute_derivative_contribution(const Vector &derivate_error) {
-      // Compute the derivate contribution
-      Vector derivate_error_contribution = Kd_lin_mat_ * derivate_error;
-  return derivate_error_contribution;
-}
-};  // namespace pid_controller
+    // Compute the derivate contribution
+    Vector derivate_error_contribution = Kd_lin_mat_ * derivate_error;
+    return derivate_error_contribution;
+  }
+};
+
 }  // namespace pid_controller
 
-#endif  // PID_CONTROLLER_HPP
+#endif  // PID_CONTROLLER_PID_HPP_

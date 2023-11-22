@@ -36,7 +36,7 @@
 
 #include "pid_controller/pid_1d.hpp"
 
-using namespace pid_1d_controller;
+namespace pid_1d_controller {
 
 class PIDTest : public ::testing::Test {
 protected:
@@ -269,6 +269,8 @@ TEST_F(PIDTest, compute_control_kd) {
   EXPECT_EQ(output, pid_params.Kd_gains * error / dt);
   reset_controller();
 }
+
+}  // namespace pid_1d_controller
 
 int main(int argc, char *argv[]) {
   ::testing::InitGoogleTest(&argc, argv);

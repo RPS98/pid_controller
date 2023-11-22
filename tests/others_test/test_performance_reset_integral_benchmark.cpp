@@ -32,11 +32,10 @@
  ********************************************************************************/
 
 #include <benchmark/benchmark.h>
-#include <exception>
-
 #include <math.h>
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
+#include <exception>
 #include <iostream>
 
 using Vector3d = Eigen::Vector3d;
@@ -50,7 +49,7 @@ Vector3d _proportional_error  = -1.0 * Vector3d::Ones();
 
 Vector3d resetIntegral1(Vector3d &integral_accum_error_, const bool &proportional_limitation) {
   if (reset_integral_flag_) {
-    for (short j = 0; j < 3; j++) {
+    for (int j = 0; j < 3; j++) {
       if (std::abs(integral_accum_error_[j]) > antiwindup_cte_[j]) {
         if (std::signbit(integral_accum_error_[j]) != std::signbit(_proportional_error[j])) {
           integral_accum_error_[j] = 0.0f;
@@ -63,7 +62,7 @@ Vector3d resetIntegral1(Vector3d &integral_accum_error_, const bool &proportiona
 
 Vector3d resetIntegral2(Vector3d &integral_accum_error_, const bool &proportional_limitation) {
   if (reset_integral_flag_) {
-    for (short j = 0; j < 3; j++) {
+    for (int j = 0; j < 3; j++) {
       if (std::abs(integral_accum_error_[j]) > antiwindup_cte_[j]) {
         if (std::signbit(integral_accum_error_[j]) != std::signbit(_proportional_error[j])) {
           integral_accum_error_[j] = 0.0f;

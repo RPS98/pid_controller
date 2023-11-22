@@ -50,48 +50,6 @@ include(CTest)
 
 # Check if tests are enabled
 if(BUILD_TESTING)
-  set(TEST_DEPENDENCIES
-    benchmark
-  )
-
-  foreach(DEPENDENCY ${TEST_DEPENDENCIES})
-    find_package(${DEPENDENCY} REQUIRED)
-  endforeach()
-
-  file(GLOB_RECURSE TEST_SOURCE "tests/**/*_test.cpp")
-
-  foreach(TEST_FILE ${TEST_SOURCE})
-    get_filename_component(TEST_NAME ${TEST_FILE} NAME_WE)
-
-    add_executable(${PROJECT_NAME}_${TEST_NAME} ${TEST_FILE})
-    target_link_libraries(${PROJECT_NAME}_${TEST_NAME} ${PROJECT_NAME})
-  endforeach()
-
-  include(FetchContent)
-  FetchContent_Declare(
-    googletest
-    URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
-  )
-  FetchContent_MakeAvailable(googletest)
-  include(GoogleTest)
-
-  file(GLOB_RECURSE TEST_SOURCE "tests/**/*_gtest.cpp")
-  MESSAGE(STATUS "TEST_SOURCE: ${TEST_SOURCE}")
-
-  foreach(TEST_FILE ${TEST_SOURCE})
-    MESSAGE(STATUS "TEST_FILE: ${TEST_FILE}")
-    get_filename_component(TEST_NAME ${TEST_FILE} NAME_WE)
-
-    add_executable(${PROJECT_NAME}_${TEST_NAME} ${TEST_FILE})
-    target_link_libraries(${PROJECT_NAME}_${TEST_NAME} GTest::gtest_main ${PROJECT_NAME})
-  endforeach()
-
-  file(GLOB_RECURSE TEST_SOURCE "tests/**/*_benchmark.cpp")
-
-  foreach(TEST_FILE ${TEST_SOURCE})
-    get_filename_component(TEST_NAME ${TEST_FILE} NAME_WE)
-
-    add_executable(${PROJECT_NAME}_${TEST_NAME} ${TEST_FILE})
-    target_link_libraries(${PROJECT_NAME}_${TEST_NAME} benchmark::benchmark ${PROJECT_NAME})
-  endforeach()
+  add_subdirectory(tests)
 endif()
+

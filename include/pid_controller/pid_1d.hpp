@@ -31,8 +31,8 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ********************************************************************************/
 
-#ifndef PID_CONTROLLER_1D_HPP
-#define PID_CONTROLLER_1D_HPP
+#ifndef PID_CONTROLLER_PID_1D_HPP_
+#define PID_CONTROLLER_PID_1D_HPP_
 
 #include <math.h>
 
@@ -83,13 +83,13 @@ public:
    *
    * @param verbose Verbosity flag. Default: false
    */
-  PID(const PIDParams<P> &pid_params = PIDParams<P>(), const bool &verbose = false)
+  explicit PID(const PIDParams<P> &pid_params = PIDParams<P>(), const bool &verbose = false)
       : verbose_(verbose) {
     update_params(pid_params);
     reset_controller();
-  };
+  }
 
-  ~PID(){};
+  ~PID() {}
 
 private:
   bool verbose_ = false;  // Verbosity flag
@@ -247,8 +247,8 @@ public:
    * @return PID output
    */
   Scalar compute_control(const Scalar dt,
-                        const Scalar proportional_error,
-                        const Scalar derivative_error) {
+                         const Scalar proportional_error,
+                         const Scalar derivative_error) {
     // Initialize values for the integral and derivative contributions
     if (first_run_) {
       first_run_               = false;
@@ -336,7 +336,7 @@ public:
     kp = Kp_;
     ki = Ki_;
     kd = Kd_;
-  };
+  }
 
   /**
    * @brief Set the Proportional Gain of the controller
@@ -450,7 +450,7 @@ public:
    * @return Scalarrue Saturation is enabled
    * @return false Saturation is disabled
    */
-  inline bool get_output_saturation_flag() const { return saturation_flag_; };
+  inline bool get_output_saturation_flag() const { return saturation_flag_; }
 
 protected:
   /**
@@ -523,6 +523,7 @@ protected:
     return derivate_error_contribution;
   }
 };
+
 }  // namespace pid_1d_controller
 
-#endif  // PID_CONTROLLER_1D_HPP
+#endif  // PID_CONTROLLER_PID_1D_HPP_

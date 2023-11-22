@@ -32,16 +32,15 @@
  ********************************************************************************/
 
 #include <benchmark/benchmark.h>
-#include <exception>
-
 #include <math.h>
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
+#include <exception>
 #include <iostream>
 
 #include "pid_controller/pid_1d.hpp"
 
-using namespace pid_1d_controller;
+namespace pid_1d_controller {
 
 static void BM_TEST(benchmark::State &b_state) {
   PIDParams pid_params;
@@ -68,5 +67,7 @@ static void BM_TEST(benchmark::State &b_state) {
   }
 }
 BENCHMARK(BM_TEST)->Threads(1)->Repetitions(10);
+
+}  // namespace pid_1d_controller
 
 BENCHMARK_MAIN();

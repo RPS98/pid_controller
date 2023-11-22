@@ -36,7 +36,7 @@
 
 #include "pid_controller/pid.hpp"
 
-using namespace pid_controller;
+namespace pid_controller {
 
 using Vector = Eigen::Vector3d;
 using Matrix = Eigen::Matrix3d;
@@ -89,6 +89,8 @@ TEST_F(SaturateOutputTest, ProportionalSaturation) {
   double x_z_angle_saturated = std::atan2(saturated[2], saturated[0]);
   ASSERT_NEAR(x_z_angle, x_z_angle_saturated, 1e-6);
 }
+
+}  // namespace pid_controller
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);

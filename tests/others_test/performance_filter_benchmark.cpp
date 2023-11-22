@@ -32,11 +32,10 @@
  ********************************************************************************/
 
 #include <benchmark/benchmark.h>
-#include <exception>
-
 #include <math.h>
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
+#include <exception>
 #include <iostream>
 
 using Vector3d = Eigen::Vector3d;

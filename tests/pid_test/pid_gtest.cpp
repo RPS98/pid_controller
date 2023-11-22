@@ -36,7 +36,7 @@
 
 #include "pid_controller/pid.hpp"
 
-using namespace pid_controller;
+namespace pid_controller {
 
 using Vector = Eigen::Vector3d;
 using Matrix = Eigen::Matrix3d;
@@ -283,6 +283,8 @@ TEST_F(PIDTest, compute_control_kd) {
   EXPECT_EQ(output, pid_params.Kd_gains.asDiagonal() * error / dt);
   reset_controller();
 }
+
+}  // namespace pid_controller
 
 int main(int argc, char *argv[]) {
   ::testing::InitGoogleTest(&argc, argv);
