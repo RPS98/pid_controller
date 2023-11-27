@@ -14,7 +14,6 @@ endif()
 
 # find dependencies
 set(PROJECT_DEPENDENCIES
-  ament_cmake
   Eigen3
 )
 
@@ -25,61 +24,32 @@ endforeach()
 include_directories(
   include
   include/${PROJECT_NAME}
-
-  # uncomment if using Eigen3
   ${EIGEN3_INCLUDE_DIRS}
 )
 
-set(SOURCE_CPP_FILES
-  src/PID.cpp
-  src/PID_3D.cpp
+set(SOURCE_HPP_FILES
+  include/${PROJECT_NAME}/pid.hpp
+  include/${PROJECT_NAME}/pid_1d.hpp
 )
 
-# create library and export it
-add_library(${PROJECT_NAME} ${SOURCE_CPP_FILES})
+# Create library
+add_library(${PROJECT_NAME} SHARED ${SOURCE_HPP_FILES})
 
+# Specify the language for the target as C++
+set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
+
+# Export library headers
 target_include_directories(${PROJECT_NAME}
   PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
-
-ament_target_dependencies(${PROJECT_NAME} ${PROJECT_DEPENDENCIES})
-
-ament_export_targets(${PROJECT_NAME} HAS_LIBRARY_TARGET)
-ament_export_dependencies(${PROJECT_DEPENDENCIES})
-
-install(
-  DIRECTORY include/
-  DESTINATION include
+  $<INSTALL_INTERFACE:include/${PROJECT_NAME}>
 )
 
-install(
-  TARGETS ${PROJECT_NAME}
-  EXPORT ${PROJECT_NAME}
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-  RUNTIME DESTINATION bin
-  INCLUDES DESTINATION include
-)
+# Tests
+include(CTest)
 
-# # check if tests are enabled
+# Check if tests are enabled
 if(BUILD_TESTING)
-  find_package(ament_cmake_cppcheck REQUIRED)
-  find_package(ament_cmake_clang_format REQUIRED)
-  find_package(benchmark REQUIRED)
-
-  ament_cppcheck(src/ include/ tests/)
-  ament_clang_format(src/ include/ tests/ --config ${CMAKE_CURRENT_SOURCE_DIR}/.clang-format)
-
-  file(GLOB TEST_SOURCE "tests/*_benchmark.cpp")
-
-  foreach(TEST_FILE ${TEST_SOURCE})
-    get_filename_component(TEST_NAME ${TEST_FILE} NAME_WE)
-
-    add_executable(${PROJECT_NAME}_${TEST_NAME} ${TEST_FILE})
-    ament_target_dependencies(${PROJECT_NAME}_${TEST_NAME} ${PROJECT_DEPENDENCIES})
-    target_link_libraries(${PROJECT_NAME}_${TEST_NAME} benchmark ${PROJECT_NAME})
-  endforeach()
+  add_subdirectory(tests)
 endif()
 
-ament_package()
