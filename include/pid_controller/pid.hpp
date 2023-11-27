@@ -47,7 +47,7 @@ struct PIDParams {
                 "MotorParams must be used with a floating-point type");
   static_assert(dim > 0, "MotorParams must be used with a positive dimension");
 
-  using Vector = Eigen::Vector<P, dim>;
+  using Vector = Eigen::Matrix<P, dim, 1>;
   using Matrix = Eigen::Matrix<P, dim, dim>;
 
   // PID gains
@@ -79,7 +79,7 @@ class PID {
   static_assert(dim > 0, "MotorParams must be used with a positive dimension");
 
   using Scalar = P;
-  using Vector = Eigen::Vector<P, dim>;
+  using Vector = Eigen::Matrix<P, dim, 1>;
   using Matrix = Eigen::Matrix<P, dim, dim>;
 
 public:
@@ -137,8 +137,8 @@ public:
     set_reset_integral_saturation_flag(params.reset_integral_flag);
     set_proportional_saturation_flag(params.proportional_saturation_flag);
 
-    if (params.lower_output_saturation != Eigen::Vector<P, dim>::Zero() ||
-        params.upper_output_saturation != Eigen::Vector<P, dim>::Zero()) {
+    if (params.lower_output_saturation != Eigen::Matrix<P, dim, 1>::Zero() ||
+        params.upper_output_saturation != Eigen::Matrix<P, dim, 1>::Zero()) {
       set_output_saturation(params.upper_output_saturation, params.lower_output_saturation,
                             params.proportional_saturation_flag);
     } else {
