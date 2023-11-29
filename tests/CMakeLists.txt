@@ -59,6 +59,26 @@ if(GTEST_SOURCE)
       COMMAND ${PROJECT_NAME}_${TEST_NAME}
     )
   endforeach()
+
+  # Coverage tests
+  if(CTEST_COVERAGE_COMMAND)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage -fprofile-arcs -ftest-coverage")
+    find_program(LCOV lcov REQUIRED)
+    find_program(GENHTML genhtml REQUIRED)
+
+    # Generate coverage script
+    set(COVERAGE_SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/coverage_script.sh")
+    file(WRITE ${COVERAGE_SCRIPT} "#!/bin/bash\n")
+    file(APPEND ${COVERAGE_SCRIPT} "${LCOV} --directory . --capture --output-file coverage.info\n")
+    file(APPEND ${COVERAGE_SCRIPT} "${LCOV} --remove coverage.info '/usr/*' '*/_deps/*' '${CMAKE_CURRENT_BINARY_DIR}/*' --output-file coverage.info\n")
+    file(APPEND ${COVERAGE_SCRIPT} "${LCOV} --list coverage.info\n")
+    file(APPEND ${COVERAGE_SCRIPT} "${GENHTML} coverage.info --output-directory coverage\n")
+    file(APPEND ${COVERAGE_SCRIPT} "echo 'Coverage tests completed. Open file in ${CMAKE_CURRENT_BINARY_DIR}/coverage/index.html'\n")
+    execute_process(COMMAND chmod +x ${COVERAGE_SCRIPT})
+
+    # Add script to CTest
+    add_test(NAME RunCoverageScript COMMAND ${COVERAGE_SCRIPT})
+  endif()
 endif()
 
 # Google Benchmark tests

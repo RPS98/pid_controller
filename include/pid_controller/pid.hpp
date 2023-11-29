@@ -164,11 +164,7 @@ public:
                              const Vector &lower_saturation,
                              bool proportional_saturation_flag = false) {
     for (int i = 0; i < dim; i++) {
-      if (upper_saturation[i] <= lower_saturation[i]) {
-        assert(upper_saturation[i] > lower_saturation[i]);
-        return;
-      }
-
+      assert(upper_saturation[i] > lower_saturation[i]);
       upper_output_saturation_ = upper_saturation;
       lower_output_saturation_ = lower_saturation;
     }
