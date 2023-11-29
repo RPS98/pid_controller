@@ -134,12 +134,41 @@ TEST_F(PIDTest, constructor) {
 
 TEST_F(PIDTest, constructor_saturation_check) {
   EXPECT_FALSE(pid->get_output_saturation_flag());
+  double epsilon = std::numeric_limits<double>::epsilon() * 0.1;
 
+  // Check saturation
   pid_params.upper_output_saturation = Vector::Ones();
+  pid_params.lower_output_saturation = -Vector::Ones();
   pid->update_params(pid_params);
   EXPECT_TRUE(pid->get_output_saturation_flag());
 
-  pid_params.upper_output_saturation = Vector::Zero();
+  // Check saturation both positive
+  pid_params.upper_output_saturation = 2.0 * Vector::Ones();
+  pid_params.lower_output_saturation = Vector::Ones();
+  pid->update_params(pid_params);
+  EXPECT_TRUE(pid->get_output_saturation_flag());
+
+  // Check saturation both negative
+  pid_params.upper_output_saturation = -Vector::Ones();
+  pid_params.lower_output_saturation = -2.0 * Vector::Ones();
+  pid->update_params(pid_params);
+  EXPECT_TRUE(pid->get_output_saturation_flag());
+
+  // Check saturation both close to zero
+  pid_params.upper_output_saturation = epsilon * Vector::Ones();
+  pid_params.lower_output_saturation = -epsilon * Vector::Ones();
+  pid->update_params(pid_params);
+  EXPECT_FALSE(pid->get_output_saturation_flag());
+
+  // Check saturation both positive and close between them
+  pid_params.upper_output_saturation = Vector::Ones();
+  pid_params.lower_output_saturation = Vector::Ones() + Vector::Ones() * epsilon;
+  pid->update_params(pid_params);
+  EXPECT_FALSE(pid->get_output_saturation_flag());
+
+  // Check saturation both negative and close between them
+  pid_params.upper_output_saturation = -Vector::Ones();
+  pid_params.lower_output_saturation = -Vector::Ones() - Vector::Ones() * epsilon;
   pid->update_params(pid_params);
   EXPECT_FALSE(pid->get_output_saturation_flag());
 }

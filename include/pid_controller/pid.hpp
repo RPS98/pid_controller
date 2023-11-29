@@ -38,6 +38,7 @@
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 #include <iostream>
+#include <limits>
 
 namespace pid_controller {
 
@@ -164,7 +165,20 @@ public:
                              const Vector &lower_saturation,
                              bool proportional_saturation_flag = false) {
     for (int i = 0; i < dim; i++) {
-      assert((upper_saturation[i] - lower_saturation[i]) > -1e-6);
+      // Check if different between upper and lower saturation is greater than epsilon
+      if (std::abs(upper_saturation[i] - lower_saturation[i]) <
+          std::numeric_limits<Scalar>::epsilon()) {
+        std::cerr << "Upper and lower saturation are equal. Saturation is disabled" << std::endl;
+        disable_output_saturation();
+        return;
+      }
+      // Check if upper saturation is greater than lower saturation
+      if (upper_saturation[i] < lower_saturation[i]) {
+        std::cerr << "Upper saturation is lower than lower saturation. Saturation is disabled"
+                  << std::endl;
+        disable_output_saturation();
+        return;
+      }
       upper_output_saturation_ = upper_saturation;
       lower_output_saturation_ = lower_saturation;
     }

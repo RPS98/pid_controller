@@ -35,10 +35,10 @@
 #define PID_CONTROLLER_PID_1D_HPP_
 
 #include <math.h>
-
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 #include <iostream>
+#include <limits>
 
 namespace pid_1d_controller {
 
@@ -150,7 +150,20 @@ public:
    * @param lower_saturation Lower saturation
    */
   void set_output_saturation(const Scalar upper_saturation, const Scalar lower_saturation) {
-    assert((upper_saturation - lower_saturation) > -1e-6);
+    // Check if different between upper and lower saturation is greater than epsilon
+    if (std::abs(upper_saturation - lower_saturation) < std::numeric_limits<Scalar>::epsilon()) {
+      std::cerr << "Upper and lower saturation are equal. Saturation is disabled" << std::endl;
+      disable_output_saturation();
+      return;
+    }
+    // Check if upper saturation is greater than lower saturation
+    if (upper_saturation < lower_saturation) {
+      std::cerr << "Upper saturation is lower than lower saturation. Saturation is disabled"
+                << std::endl;
+      disable_output_saturation();
+      return;
+    }
+
     upper_output_saturation_ = upper_saturation;
     lower_output_saturation_ = lower_saturation;
     saturation_flag_         = true;
