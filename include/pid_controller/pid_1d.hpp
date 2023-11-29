@@ -150,8 +150,7 @@ public:
    * @param lower_saturation Lower saturation
    */
   void set_output_saturation(const Scalar upper_saturation, const Scalar lower_saturation) {
-    assert((upper_saturation - lower_saturation) > -1e-6,
-           "Upper saturation must be greater than lower saturation");
+    assert((upper_saturation - lower_saturation) > -1e-6);
     upper_output_saturation_ = upper_saturation;
     lower_output_saturation_ = lower_saturation;
     saturation_flag_         = true;
