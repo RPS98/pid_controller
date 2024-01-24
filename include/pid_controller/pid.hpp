@@ -58,7 +58,7 @@ struct PIDParams {
 
   // PID params
   Vector antiwindup_cte    = Vector::Zero();  // Integral anti-windup
-  Vector alpha             = Vector::Zero();  // Derivative filter
+  Vector alpha             = Vector::Ones();  // Derivative filter
   bool reset_integral_flag = false;           // Reset integral flag when error sign changes
 
   // PID Output saturation

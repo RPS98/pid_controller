@@ -56,7 +56,7 @@ struct PIDParams {
 
   // PID params
   Scalar antiwindup_cte    = 0.0;    // Integral anti-windup
-  Scalar alpha             = 0.0;    // Derivative filter
+  Scalar alpha             = 1.0;    // Derivative filter
   bool reset_integral_flag = false;  // Reset integral flag when error sign changes
 
   // PID Output saturation
@@ -101,7 +101,7 @@ private:
 
   // PID params
   Scalar antiwindup_cte_    = 0.0;    // Integral anti-windup
-  Scalar alpha_             = 0.0;    // Derivative filter
+  Scalar alpha_             = 1.0;    // Derivative filter
   bool reset_integral_flag_ = false;  // Reset integral flag when error sign changes
 
   // PID Output saturation
@@ -241,7 +241,7 @@ public:
     Scalar derivate_error_contribution =
         compute_derivative_contribution_by_deriving(dt, proportional_error);
 
-    // Compute output speed
+    // Compute output velocity
     Scalar output =
         proportional_error_contribution + integral_error_contribution + derivate_error_contribution;
 
@@ -279,7 +279,7 @@ public:
     // // Compute the derivate contribution
     Scalar derivate_error_contribution = compute_derivative_contribution(derivative_error);
 
-    // Compute output speed
+    // Compute output velocity
     Scalar output =
         proportional_error_contribution + integral_error_contribution + derivate_error_contribution;
 
